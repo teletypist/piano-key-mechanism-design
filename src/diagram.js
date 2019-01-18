@@ -7,13 +7,28 @@ import {
     dtheta,
     flength,
     memberLengths,
-    membersFromValues} from './functions'
+    membersFromValues,
+    shapesFromValues} from './functions'
 
-const mapStateForMember = (state) => ({
-    thick: state.values.memberWidth/2,
-    keyDepth: state.values.memberWidth + Math.max(state.values.upKeyProjection, state.values.downKeyProjection),
-    baseDepth: state.values.memberWidth + Math.max(Math.abs(state.values.upBaseProjection), Math.abs(state.values.downBaseProjection)),
-})
+const mapStateForMember = (state, props) => {
+    var keyDepth, baseDepth;
+    keyDepth = state.values.memberWidth + Math.max(state.values.upKeyProjection, state.values.downKeyProjection)
+    baseDepth = state.values.memberWidth + Math.max(Math.abs(state.values.upBaseProjection), Math.abs(state.values.downBaseProjection))
+    return {
+      thick: state.values.memberWidth/2,
+      height: (props.base)?baseDepth : keyDepth,
+    }
+}
+
+const mapStateForShape = (state, props) => {
+    var keyDepth, baseDepth;
+    keyDepth = state.values.memberWidth + Math.max(state.values.upKeyProjection, state.values.downKeyProjection)
+    baseDepth = state.values.memberWidth + Math.max(Math.abs(state.values.upBaseProjection), Math.abs(state.values.downBaseProjection))
+    return {
+      thick: state.values.memberWidth/2,
+      height: (props.base)?baseDepth : keyDepth,
+    }
+}
 
 const mapStateForJoint = (state) => ({
     r: state.values.pinRadius,
@@ -52,13 +67,29 @@ const Member = connect(mapStateForMember)(({x, y, angle, length, thick=5.0, keyD
                 <Joint x={x2} y={y2}/>
             </g>
         }
-        {!(box || shape) && <path d={path.join(" ")} fill="none" stroke="black" strokeWidth="0.1"/>}
-        {(box || shape) &&
-            <g transform={"translate(" + x + " " + y + ") rotate(" + (angle*180/Math.PI) + ")"} >
-                {box && <rect x={0} y={-thick} width={length} height={(base)?baseDepth:keyDepth} fill="none" stroke="black" strokeWidth="0.1"/>}
-                {shape && <path stroke="black" fill="none" strokeWidth="0.1" d={shape}/>}
+        <path d={path.join(" ")} fill="none" stroke="black" strokeWidth="0.1"/>
+    </g>
+})
+
+
+const Shape = connect(mapStateForMember)(({x, y, angle, length, thick=5.0, height, noJoint, shape}) => {
+    var x1, x2, y1, y2;
+    angle = -angle
+    x1 = x
+    y1 = y
+    x2 = x1 + length*Math.cos(angle);
+    y2 = y1 + length*Math.sin(angle);
+    return <g>
+        {!noJoint &&
+            <g>
+                <Joint x={x1} y={y1}/>
+                <Joint x={x2} y={y2}/>
             </g>
         }
+        <g transform={"translate(" + x + " " + y + ") rotate(" + (angle*180/Math.PI) + ")"} >
+            {!shape && <rect x={0} y={-thick} width={length} height={height} fill="none" stroke="black" strokeWidth="0.1"/>}
+            {shape && <path stroke="black" fill="none" strokeWidth="0.1" d={shape}/>}
+        </g>
     </g>
 })
 
@@ -96,15 +127,16 @@ const Base = connect(mapStateForBase)(({x, y, offset=5.0, thick=5.0}) => {
         )}
     </g>
 })
- 
+
 class Diagram extends React.Component {
     render() {
-        var {members, joints, marks, bases, width, height, viewBox} = this.props;
+        var {members, joints, marks, bases, shapes, width, height, viewBox} = this.props;
         return <svg width={width} viewBox={viewBox}>
             {bases.map((base, index) => <Base {...base} key={index}/>)}
             {joints.map((joint, index) => <Joint {...joint} key={index} />)}
             {marks.map((mark, index) => <Mark {...mark} key={index} />)}
             {members.map((member, index) => <Member {...member} key={index} />)}
+            {shapes.map((shape, index) => <Shape {...shape} key={index} />)}
         </svg>
     }
 }
@@ -135,6 +167,7 @@ function mapStateToProps(state) {
             upFrontKeyFoot,
         ],
         members: membersFromValues(state.values),
+        shapes: shapesFromValues(state.values),
     }
 }
 

@@ -16,7 +16,7 @@ const circleIntersection = (circle1, circle2, err=0.000001) => {
     r2 = circle2.r
     reach = Math.sqrt((x1-x2)**2 + (y1-y2)**2)
 
-    if (reach > r1 + r2 || 
+    if (reach > r1 + r2 ||
         reach + Math.min(r1, r2) < Math.max(r1, r2))
     {
         throw "No Solution"
@@ -265,7 +265,7 @@ const calculations = [
     //Up Key Front
     ({upForwardKey, offset}) => ({
         upFrontKey: {
-            x: upForwardKey.x + offset, 
+            x: upForwardKey.x + offset,
             y: upForwardKey.y
         },
     }),
@@ -364,11 +364,14 @@ const baseShape = ({offset}) => []
 
 
 export const membersFromValues = (v) => [
-    {...t({x: v.nowForwardKey.x + v.offset*Math.cos(v.keyAngle), y: v.nowForwardKey.y + v.offset*Math.sin(v.keyAngle)}), angle: ang(v.nowRearwardKey, v.nowForwardKey), length: v.keyLength, noJoint: true, shape: keyShape(v)},
     {...t(v.rearwardBase), angle: v.nowTheta, length: v.fixedLength},
     {...t(v.forwardBase), angle: ang(v.forwardBase, v.nowBaseCrankJoint), length: v.baseDriver},
     {...t(v.nowBaseCrankJoint), angle: ang(v.nowBaseCrankJoint, v.nowFixedJoint), length: v.baseDriver},
     {...t(v.nowFixedJoint), angle: v.nowCrankAngle, length: v.keyCrank},
     {...t(v.nowKeyCrankJoint), angle: ang(v.nowKeyCrankJoint, v.nowRearwardKey), length: v.keyDriver},
-    {...t({x: v.rearwardBase.x - (v.keyLength - v.offset - v.stretch), y: 0}), angle: 0, length: v.keyLength, box: true, noJoint: true, base: true},
+]
+
+export const shapesFromValues = (v) => [
+    {...t({x: v.nowForwardKey.x + v.offset*Math.cos(v.keyAngle), y: v.nowForwardKey.y + v.offset*Math.sin(v.keyAngle)}), angle: ang(v.nowRearwardKey, v.nowForwardKey), length: v.keyLength, noJoint: true, shape: keyShape(v)},
+    {...t({x: v.rearwardBase.x - (v.keyLength - v.offset - v.stretch), y: 0}), angle: 0, length: v.keyLength, noJoint: true, base: true},
 ]

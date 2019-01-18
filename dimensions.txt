@@ -1,0 +1,11 @@
+white key front: 22.4mm
+CDE key upper width: 13.5mm
+FGAB key upper width: 12.5mm
+Octave: 164mm
+Key Gap: 1.2mm
+Black key width: 12.1mm
+Black key length: 105mm
+White key length: 154mm
+Lever length: 235mm
+Forward dip: 10.3mm
+
